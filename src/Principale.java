@@ -3,16 +3,17 @@ import com.sun.star.sheet.XSpreadsheet;
 
 
 public class Principale {
-
-	public static String workDir="/Users/fguntz/Documents/NOTES/NOTES_2016-2017";
 		
 	public static void main(String[] args)
 	{	
 		SpreadsheetDocuments spreadsheetDocumentsNotes = new SpreadsheetDocuments();
 		SpreadsheetDocuments spreadsheetDocumentsRn = new SpreadsheetDocuments();
 		SpreadsheetDocuments spreadsheetDocumentsRecap = new SpreadsheetDocuments();
-		XComponent xDocNotes = null, xDocRN=null;
-		XSpreadsheet feuilleEPR=null, feuilleELP, feuilleRN;	
+		XComponent xDocNotes, xDocRN;
+		XSpreadsheet feuilleEPR, feuilleELP, feuilleRN;
+
+		//A TESTER MAIS A PRIORI CHEMIN RELATIF ?
+        String workDir="/Users/fguntz/Documents/NOTES/NOTES_2016-2017";
 		
 		try 
 		{
@@ -30,7 +31,7 @@ public class Principale {
 			
 			
 			//INITIALISATION PROMO	
-			Promo2 promo = new Promo2();
+			Promo promo = new Promo();
 			promo.getInfosPromo(cheminFichierJSON);
 			
 			//**********************************************************************************
@@ -60,7 +61,9 @@ public class Principale {
 			//**********************************************************************************
 			
 			String filename = workDir+"/"+fichierLocalNotes;
-			//getFichierNotes(filename,promo.getUrlNotes());			
+			//à placer en argument de l'appli
+			boolean onLine=true;
+			if(onLine){Divers.getFichierNotes(filename,promo.getUrlNotes());}
 			
 			//**********************************************************************************
 			// OUVERTURE DU FICHIER EXPORT DE NOTES
@@ -88,7 +91,8 @@ public class Principale {
 			// OPERATION DE RECUPERATION DE LA STRUCTURE D'UNE PROMO : UE, MODULES, EPREUVES
 			// AU PASSAGE ON RECUPERE TOUTES LES NOTES CONNUES ET CALCULEES PAR APOGEE
 			// AU PASSAGE ON DETERMINE MIN, MAX, MOY ET CLASSEMENT EPREUVE
-			//**********************************************************************************		
+			//***********************************************************************************
+
 			promo.getStructureEtNotesPromo(cheminFichierJSON,spreadsheetDocumentsNotes,feuilleELP,feuilleEPR,spreadsheetDocumentsRn,feuilleRN);
 			
 			//ON FERME RELEVE DE NOTES
@@ -119,6 +123,10 @@ public class Principale {
 			//ON FERME LE FICHIER DE NOTES
 			spreadsheetDocumentsNotes.closeSpreadsheetDocument(xDocNotes);
 			Divers.addMessage("fichier notes local fermé - "+cheminFichierLocalNotes);
+
+			//ON SORT DU PROGRAMME
+			Divers.addMessage("programme terminé");
+			System.exit(0);
 		}
 		catch (Exception e) 
 		{
@@ -126,19 +134,4 @@ public class Principale {
 		}
 				
 	}
-	
-	public static void getFichierNotes(String filename, String url) {
-		
-		//String url="http://perso.univ-lemans.fr/~fguntz/essai.ods";
-		////String cheminDestFichierReseau=workDir+"/"+fichierLocalNotes;
-	    ////Divers.getFileURL(cheminDestFichierReseau,url);
-		try{
-			Divers.getFileURL2(filename,url);
-		}
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}		
-	}
-
 }
