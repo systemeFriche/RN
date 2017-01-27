@@ -34,29 +34,6 @@ public class SpreadsheetDocuments {
     // METHODES GENERIQUES 
     //
     //
-	
-	 protected XComponent newDocComponentFromTemplate(String loadUrl)
-	     throws java.lang.Exception
-	 {
-	     // get the remote service manager
-	     mxRemoteServiceManager = this.getRemoteServiceManager();
-	     // retrieve the Desktop object, we need its XComponentLoader
-	     Object desktop = mxRemoteServiceManager.createInstanceWithContext(
-	         "com.sun.star.frame.Desktop", mxRemoteContext);
-	     XComponentLoader xComponentLoader = (XComponentLoader)
-	         UnoRuntime.queryInterface(XComponentLoader.class, desktop);
-	     
-	     // define load properties according to com.sun.star.document.MediaDescriptor
-	     // the boolean property AsTemplate tells the office to create a new document
-	     // from the given file
-	     PropertyValue[] loadProps = new PropertyValue[1];
-	     loadProps[0] = new PropertyValue();
-	     //loadProps[0].Name = "AsTemplate";
-	     loadProps[0].Name = "Hidden";
-	     loadProps[0].Value = new Boolean(true);       
-	     // load
-	     return xComponentLoader.loadComponentFromURL(loadUrl, "_blank",0, loadProps);           
-	 }
 	 
 	 static XMultiComponentFactory getRemoteServiceManager()
 	            throws java.lang.Exception
@@ -313,8 +290,7 @@ public class SpreadsheetDocuments {
 	            System.err.println("Impossible de récupérer la cellule");
 	            ex.printStackTrace(System.err);
 	        }	
-	        
-	        //xCell.setFormula(valeur);
+
 	        xCellText = (XText)UnoRuntime.queryInterface(XText.class, xCell);
 	        xCellText.setString(valeur);
 	    }
@@ -383,52 +359,7 @@ public class SpreadsheetDocuments {
 			
 			return notesElement;   	
 	    }
-	    
-	    //ANCIEN SYSTEME
-	    //A SUPPRIMER
-	    public List<NoteEtudiant> getNotes2(XSpreadsheet xSheet, int colonne, int nbrEtu){
-	    	
-	    	List<NoteEtudiant> noteEpreuve1 = new ArrayList<NoteEtudiant>();
-			
-			int i;
-			int codeEtu;
-			Double valeur;
-			String valeurString;
-			
-			//TANT QU'IL Y A UN ETUDIANT ON RECUPERE LES NOTES
-			
-			for(i = 1; i <= nbrEtu; i++){
-				
-				NoteEtudiant note = new NoteEtudiant();
-				
-				codeEtu = this.readIntCellule(xSheet,0,i);
-				valeurString=this.readStringCellule(xSheet, colonne, i);
-				//si pas de note alors étudiant ABJ on met une note égale à -1 pour la détecter dans les traitements ultérieurs
-				if(valeurString.equals("")){
-					valeur=-1.0;
-				}
-				else{
-					valeur = this.readDoubleCellule(xSheet,colonne,i);
-				}
-					
-				note.setCodeEtu(codeEtu);
-				note.setNoteEtu(valeur);  
-				noteEpreuve1.add(note);	
-			}
-			
-			return noteEpreuve1;
-	    	
-	    } 	 	    
-	     	    
-	    public String getCodeEpreuve(XSpreadsheet xSheet, int colonne){
-			
-			String code;
-			
-			code = this.readStringCellule(xSheet,colonne,0);
 
-			return code;
-	    	
-	    } 
 	    
 	    public int getNbrNotes(XSpreadsheet xSheet, int colonne,int nbrEtu){
 	    	
@@ -442,17 +373,7 @@ public class SpreadsheetDocuments {
 	    		}
 	    	}
 			return nbrNotes;
-	    }    
-	    
-	    public int getCodeEtu(XSpreadsheet xSheet, int ligne){
-			
-			int code;
-			
-			code = this.readIntCellule(xSheet,0,ligne);
-
-			return code;
-	    	
-	    } 	
+	    }
 	
 	    public String getNomEtu(XSpreadsheet xSheet, int ligne){
 			
@@ -524,7 +445,7 @@ public class SpreadsheetDocuments {
 				code = this.readStringCellule(xSheet,colonne,ligne);
 			}while(code.equals(""));
 			
-			while(!(Divers.caseContientCodeApogee(code,codeApogeeElement))){	
+			while(!(Divers.texteContientCodeApogee(code,codeApogeeElement))){
 				ligne++;
 				code = this.readStringCellule(xSheet,colonne,ligne);
 				
@@ -583,31 +504,11 @@ public class SpreadsheetDocuments {
 	    public void writeEnseignantRN(XSpreadsheet xSheet, int ligneEpreuve, String enseignant){		
 			this.writeStringCellule(xSheet,5,ligneEpreuve,enseignant);	
 	    }
-	    public void writeNoteSportRN(XSpreadsheet xSheet, Double noteSportRN){
-	    	if(noteSportRN!=-1){
-				this.writeDoubleCellule(xSheet,7,6,noteSportRN);    		    		
-	    	}
-	    }
 	    
 	    //
 	    // METHODE POUR LIRE/ECRIRE DANS L'ONGLET RECAP
 	    //
 	    //
-	    
-	    //******** A PRIORI PAS BESOIN A SUPPRIMER
-	    public int searchEtuRecap(XSpreadsheet xSheet, int codeEtu, int nbrEtu){
-			
-			int i;
-			int codeEtuFeuille;
-			
-			for(i = 1; i <= nbrEtu; i++){
-				codeEtuFeuille = this.readIntCellule(xSheet, 0, i);
-				if(codeEtuFeuille==codeEtu){
-					break;
-				}
-			}
-			return i;
-	    } 	
 	    
 	    public void setInfosEtuRecap(XSpreadsheet xSheet, int ligne, int codeEtu, String nomEtu, String prenomEtu){
 	    	this.writeIntCellule(xSheet, 0, ligne+1, codeEtu);
@@ -624,35 +525,6 @@ public class SpreadsheetDocuments {
 			//this.writeDoubleCelluleCouleur(xSheet,i,j,valeurArrondie,limite);
 			this.writeDoubleCelluleCouleur(xSheet,col,lig,valeur,limite);
 			
-		}
-
-		public void writeNoteModuleRecapOLD(XSpreadsheet xSheet, int i, int j, double valeur,double precisionDecimale, double limite) throws UnknownPropertyException, PropertyVetoException, IllegalArgumentException, WrappedTargetException {
-			
-			double valeurArrondie;
-			double precision=(Double)Math.pow(10, precisionDecimale);
-			
-			valeurArrondie=Math.round(valeur*precision)/precision;
-			this.writeDoubleCelluleCouleur(xSheet,i,j,valeurArrondie,limite);
-			
-		}
-		
-		public int getNbrEtudiants(XSpreadsheet xSheet){
-			
-			int ligne=1,nbrEtu=0,codeEtu;
-			
-			codeEtu = readIntCellule(xSheet,0,ligne);
-			
-			if(codeEtu==0){
-				System.out.println("ERREUR : Il n'y a pas d'étudiants");
-			}
-			else{
-				do{
-					nbrEtu+=1;
-					codeEtu = readIntCellule(xSheet,0,nbrEtu);
-				}while(codeEtu!=0);
-			}
-			
-			return (nbrEtu-1);
 		}
 		
 }

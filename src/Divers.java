@@ -27,31 +27,7 @@ import java.net.Proxy;
 public class Divers
 {
 
-public static void getFileURL(final String filename, final String urlString) throws MalformedURLException, java.io.IOException {
-  
-		//CODE QUI FONCTIONNE MAIS PAS A TRAVERS LE PROXY
-	     BufferedInputStream in = null;
-	     FileOutputStream fout = null;
-	     try {
-	         in = new BufferedInputStream(new URL(urlString).openStream());
-	         fout = new FileOutputStream(filename);
-
-	         final byte data[] = new byte[1024];
-	         int count;
-	         while ((count = in.read(data, 0, 1024)) != -1) {
-	             fout.write(data, 0, count);
-	         }
-	     } finally {
-	         if (in != null) {
-	             in.close();
-	         }
-	         if (fout != null) {
-	             fout.close();
-	         }
-	     }
-	}
-
-public static void getFileURL2(final String filename, final String urlString) throws Exception {
+public static void getFichierNotes(final String filename, final String urlString) throws Exception {
 	
     CloseableHttpClient httpClient = HttpClients.createDefault();
     
@@ -242,7 +218,7 @@ public static void addMessage(String message){
 	System.out.println(message);	
 }
 
-public static boolean caseContientCodeApogee(String codeCase, String codeApogee){
+public static boolean texteContientCodeApogee(String codeCase, String codeApogee){
 	
 	int i;
 	String[] codeCaseDecompose;

@@ -4,14 +4,14 @@ import java.util.List;
 class Ue extends Element {
 	
 	//La liste des modules de l'UE
-	private List<Module2> listeModulesUe = new ArrayList<Module2>();
+	private List<Module> listeModulesUe = new ArrayList<Module>();
 	
 	
-    public List<Module2> getListeModules() {
+    public List<Module> getListeModules() {
         return listeModulesUe;
     }
 
-	public void setListeModules(List<Module2> listeModulesUE1){
+	public void setListeModules(List<Module> listeModulesUE1){
         this.listeModulesUe = listeModulesUE1;	
 	}
 	
@@ -22,8 +22,8 @@ public void calculMoyenneUe(int nbrEtu){
 		double noteEtu[]=new double[nbrEtu];
 		int codeEtu[]=new int[nbrEtu];
 		double coeffModule[] = new double[nbrEtu];
-		Module2 module;
-		List<Module2> listeModule=this.getListeModules();
+		Module module;
+		List<Module> listeModule=this.getListeModules();
 		List<NoteElement> notes;
 		int nbrNotesCalculees=0;
 		String messageErreur;
